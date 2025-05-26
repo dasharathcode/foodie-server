@@ -43,8 +43,8 @@ app.use('/api/banner', bannerRoutes);
 
 app.use(cors({
     origin: [
-      "http://localhost:5174",         // Allow frontend from localhost
-      ,"http://localhost:5173"
+      "http://localhost:514",         // Allow frontend from localhost
+      ,"http://localhost:513"
     ],
     credentials: true
   }));
