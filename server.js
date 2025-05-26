@@ -43,8 +43,10 @@ app.use('/api/banner', bannerRoutes);
 
 app.use(cors({
     origin: [
-      "http://localhost:514",         // Allow frontend from localhost
-      ,"http://localhost:513"
+      "http://localhost:5174",         // Allow frontend from localhost
+      ,"http://localhost:5173",
+      "https://foodie-admin-umber.vercel.app",
+      "https://foodiee-three.vercel.app"
     ],
     credentials: true
   }));
