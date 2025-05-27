@@ -67,7 +67,9 @@ router.get('/stats', async (req, res) => {
             totalOrders,
             totalRevenue,
             newUsersToday,
-            newUsersThisWeek
+            newUsersThisWeek,
+            deliveredOrders
+
         });
 
     } catch (error) {
