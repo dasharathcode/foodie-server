@@ -138,68 +138,9 @@
 // export default router;
 
 
-// import express from 'express';
-// import userModel from '../models/userModel.js';
-// import orderModel from '../models/orderModel.js';
-
-// const router = express.Router();
-
-// router.get('/stats', async (req, res) => {
-//     try {
-//         const totalUsers = await userModel.countDocuments();
-//         const totalOrders = await orderModel.countDocuments();
-//         const deliveredOrdersCount = await orderModel.countDocuments({ status: 'Delivered' });
-
-//         // Revenue from delivered orders
-//         const deliveredOrders = await orderModel.find({ status: 'Delivered' });
-//         const totalRevenue = deliveredOrders.reduce((acc, order) => acc + order.amount, 0);
-
-//         // === Date calculations ===
-//         const today = new Date();
-//         today.setHours(0, 0, 0, 0);
-
-//         const weekStart = new Date();
-//         weekStart.setDate(today.getDate() - 7);
-//         weekStart.setHours(0, 0, 0, 0);
-
-//         const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-
-//         // === User stats ===
-//         const newUsersToday = await userModel.countDocuments({ createdAt: { $gte: today } });
-//         const newUsersThisWeek = await userModel.countDocuments({ createdAt: { $gte: weekStart } });
-
-//         // === Order stats ===
-//         const ordersToday = await orderModel.countDocuments({ createdAt: { $gte: today } });
-//         const ordersThisWeek = await orderModel.countDocuments({ createdAt: { $gte: weekStart } });
-//         const ordersThisMonth = await orderModel.countDocuments({ createdAt: { $gte: monthStart } });
-
-//         res.json({
-//             totalUsers,
-//             totalOrders,
-//             totalRevenue,
-//             deliveredOrdersCount,
-//             newUsersToday,
-//             newUsersThisWeek,
-//             ordersToday,
-//             ordersThisWeek,
-//             ordersThisMonth
-//         });
-
-//     } catch (error) {
-//         console.error('Error getting stats:', error);
-//         res.status(500).json({ error: 'Internal Server Error' });
-//     }
-// });
-
-// export default router;
-
-
-
-
 import express from 'express';
 import userModel from '../models/userModel.js';
 import orderModel from '../models/orderModel.js';
-import productModel from '../models/productModel.js'; // FIXED: import productModel
 
 const router = express.Router();
 
@@ -209,9 +150,11 @@ router.get('/stats', async (req, res) => {
         const totalOrders = await orderModel.countDocuments();
         const deliveredOrdersCount = await orderModel.countDocuments({ status: 'Delivered' });
 
+        // Revenue from delivered orders
         const deliveredOrders = await orderModel.find({ status: 'Delivered' });
         const totalRevenue = deliveredOrders.reduce((acc, order) => acc + order.amount, 0);
 
+        // === Date calculations ===
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
@@ -221,42 +164,14 @@ router.get('/stats', async (req, res) => {
 
         const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
 
+        // === User stats ===
         const newUsersToday = await userModel.countDocuments({ createdAt: { $gte: today } });
         const newUsersThisWeek = await userModel.countDocuments({ createdAt: { $gte: weekStart } });
 
+        // === Order stats ===
         const ordersToday = await orderModel.countDocuments({ createdAt: { $gte: today } });
         const ordersThisWeek = await orderModel.countDocuments({ createdAt: { $gte: weekStart } });
         const ordersThisMonth = await orderModel.countDocuments({ createdAt: { $gte: monthStart } });
-
-        // === Top 5 Selling Products ===
-        const topSellingFoods = await orderModel.aggregate([
-            { $unwind: "$items" },
-            {
-                $group: {
-                    _id: "$items.productId",
-                    totalSold: { $sum: "$items.quantity" }
-                }
-            },
-            { $sort: { totalSold: -1 } },
-            { $limit: 5 },
-            {
-                $lookup: {
-                    from: "products", // FIXED: your collection name
-                    localField: "_id",
-                    foreignField: "_id",
-                    as: "product"
-                }
-            },
-            { $unwind: "$product" },
-            {
-                $project: {
-                    _id: 0,
-                    name: "$product.name",
-                    image: { $arrayElemAt: ["$product.image", 0] }, // show first image
-                    totalSold: 1
-                }
-            }
-        ]);
 
         res.json({
             totalUsers,
@@ -267,8 +182,7 @@ router.get('/stats', async (req, res) => {
             newUsersThisWeek,
             ordersToday,
             ordersThisWeek,
-            ordersThisMonth,
-            topSellingFoods
+            ordersThisMonth
         });
 
     } catch (error) {
@@ -278,3 +192,6 @@ router.get('/stats', async (req, res) => {
 });
 
 export default router;
+
+
+
