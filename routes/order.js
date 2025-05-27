@@ -1,26 +1,10 @@
-import express from 'express';
-import orderModel from '../models/order.js';
+// routes/orderRoutes.js বা যেখানে রাউট বানাও
 
-const router = express.Router();
+import express from 'express'
+import { removeOrder } from '../controllers/orderController.js'
 
-// Get all orders
-router.get('/admin', async (req, res) => {
-  try {
-    const orders = await orderModel.find().sort({ date: -1 });
-    res.json(orders);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+const router = express.Router()
 
-// Delete an order
-router.delete('/admin/:id', async (req, res) => {
-  try {
-    await orderModel.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Order deleted' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+router.post('/remove', removeOrder)
 
-export default router;
+export default router
