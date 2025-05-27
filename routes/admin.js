@@ -90,6 +90,54 @@
 
 
 
+// import express from 'express';
+// import userModel from '../models/userModel.js';
+// import orderModel from '../models/orderModel.js';
+
+// const router = express.Router();
+
+// router.get('/stats', async (req, res) => {
+//     try {
+//         const totalUsers = await userModel.countDocuments();
+//         const totalOrders = await orderModel.countDocuments();
+
+//         // ✅ Only count delivered orders instead of fetching full documents
+//         const deliveredOrdersCount = await orderModel.countDocuments({ status: 'Delivered' });
+
+//         // ✅ Total revenue from delivered orders only
+//         const deliveredOrders = await orderModel.find({ status: 'Delivered' });
+//         const totalRevenue = deliveredOrders.reduce((acc, order) => acc + order.amount, 0);
+
+//         // Date boundaries
+//         const today = new Date();
+//         today.setHours(0, 0, 0, 0); // Start of today
+
+//         const weekStart = new Date();
+//         weekStart.setDate(weekStart.getDate() - 7);
+//         weekStart.setHours(0, 0, 0, 0); // Start of 7 days ago
+
+//         const newUsersToday = await userModel.countDocuments({ createdAt: { $gte: today } });
+//         const newUsersThisWeek = await userModel.countDocuments({ createdAt: { $gte: weekStart } });
+
+//         // ✅ Return count instead of full list
+//         res.json({
+//             totalUsers,
+//             totalOrders,
+//             totalRevenue,
+//             deliveredOrdersCount,
+//             newUsersToday,
+//             newUsersThisWeek
+//         });
+
+//     } catch (error) {
+//         console.error('Error getting stats:', error);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// });
+
+// export default router;
+
+
 import express from 'express';
 import userModel from '../models/userModel.js';
 import orderModel from '../models/orderModel.js';
@@ -100,33 +148,47 @@ router.get('/stats', async (req, res) => {
     try {
         const totalUsers = await userModel.countDocuments();
         const totalOrders = await orderModel.countDocuments();
-
-        // ✅ Only count delivered orders instead of fetching full documents
         const deliveredOrdersCount = await orderModel.countDocuments({ status: 'Delivered' });
 
-        // ✅ Total revenue from delivered orders only
         const deliveredOrders = await orderModel.find({ status: 'Delivered' });
         const totalRevenue = deliveredOrders.reduce((acc, order) => acc + order.amount, 0);
 
-        // Date boundaries
+        // Date calculations
+        const now = new Date();
+
+        // Start of today
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Start of today
+        today.setHours(0, 0, 0, 0);
 
+        // Start of the week (7 days ago)
         const weekStart = new Date();
-        weekStart.setDate(weekStart.getDate() - 7);
-        weekStart.setHours(0, 0, 0, 0); // Start of 7 days ago
+        weekStart.setDate(now.getDate() - 7);
+        weekStart.setHours(0, 0, 0, 0);
 
+        // Start of the month (30 days ago)
+        const monthStart = new Date();
+        monthStart.setDate(now.getDate() - 30);
+        monthStart.setHours(0, 0, 0, 0);
+
+        // New users
         const newUsersToday = await userModel.countDocuments({ createdAt: { $gte: today } });
         const newUsersThisWeek = await userModel.countDocuments({ createdAt: { $gte: weekStart } });
 
-        // ✅ Return count instead of full list
+        // Orders by time
+        const todayOrders = await orderModel.countDocuments({ createdAt: { $gte: today } });
+        const thisWeekOrders = await orderModel.countDocuments({ createdAt: { $gte: weekStart } });
+        const thisMonthOrders = await orderModel.countDocuments({ createdAt: { $gte: monthStart } });
+
         res.json({
             totalUsers,
             totalOrders,
             totalRevenue,
             deliveredOrdersCount,
             newUsersToday,
-            newUsersThisWeek
+            newUsersThisWeek,
+            todayOrders,
+            thisWeekOrders,
+            thisMonthOrders
         });
 
     } catch (error) {
@@ -136,5 +198,3 @@ router.get('/stats', async (req, res) => {
 });
 
 export default router;
-
-
