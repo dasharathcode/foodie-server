@@ -19,8 +19,7 @@ app.use(express.json())
 app.use(cors())
 
 
-import orderRoutes from './routes/order.js';
-app.use('/api/orders', orderRoutes);
+
 
 
 
