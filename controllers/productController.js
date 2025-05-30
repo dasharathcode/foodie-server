@@ -11,8 +11,10 @@ const addProduct = async (req, res) => {
         const image2 = req.files.image2 && req.files.image2[0]
         const image3 = req.files.image3 && req.files.image3[0]
         const image4 = req.files.image4 && req.files.image4[0]
+        const image5 = req.files.image5 && req.files.image5[0]
+        const image6 = req.files.image6 && req.files.image6[0]
 
-        const images = [image1, image2, image3, image4].filter((item) => item !== undefined)
+        const images = [image1, image2, image3, image4,image5,image6].filter((item) => item !== undefined)
 
         let imagesUrl = await Promise.all(
             images.map(async (item) => {
@@ -49,9 +51,9 @@ const addProduct = async (req, res) => {
 // function for list product
 const listProducts = async (req, res) => {
     try {
-        
+
         const products = await productModel.find({});
-        res.json({success:true,products})
+        res.json({ success: true, products })
 
     } catch (error) {
         console.log(error)
@@ -62,9 +64,9 @@ const listProducts = async (req, res) => {
 // function for removing product
 const removeProduct = async (req, res) => {
     try {
-        
+
         await productModel.findByIdAndDelete(req.body.id)
-        res.json({success:true,message:"Product Removed"})
+        res.json({ success: true, message: "Product Removed" })
 
     } catch (error) {
         console.log(error)
@@ -75,10 +77,10 @@ const removeProduct = async (req, res) => {
 // function for single product info
 const singleProduct = async (req, res) => {
     try {
-        
+
         const { productId } = req.body
         const product = await productModel.findById(productId)
-        res.json({success:true,product})
+        res.json({ success: true, product })
 
     } catch (error) {
         console.log(error)
